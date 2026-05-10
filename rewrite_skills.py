@@ -275,6 +275,7 @@ def process_skill(skill_name):
                 
                 # Skill-specific rewrites
                 if is_skill_md:
+                    content = rewrite_skill_frontmatter(content, skill_name)
                     if skill_name == "using-superpowers":
                         content = rewrite_using_superpowers(content)
                     elif skill_name == "dispatching-parallel-agents":
