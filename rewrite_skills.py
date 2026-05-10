@@ -31,6 +31,14 @@ SKILL_NAMES = [
 def sp_name(name):
     return f"sp-{name}"
 
+def rewrite_skill_frontmatter(content, skill_name):
+      return re.sub(
+          rf'(^name:\s*){re.escape(skill_name)}(\s*$)',
+          rf'\g<1>sp-{skill_name}\2',
+          content,
+          count=1,
+          flags=re.MULTILINE,
+      )
 
 def rewrite_cross_references(content):
     """Replace superpowers:X -> sp-X and update bare skill name references."""
