@@ -1,0 +1,46 @@
+name: Build and Release SP-Prefixed Skills
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Sync upstream
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add upstream https://github.com/obra/superpowers.git
+          git fetch upstream main
+          git merge --no-edit upstream/main
+
+      - name: Adapt skills for Agent Zero
+        run: python3 rewrite_skills.py
+
+      - name: Create release zip
+        run: |
+          cd skills-adapted
+          zip -r ../skills-sp-prefixed.zip *
+
+      - name: Upload to release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: latest
+          name: "Superpowers SP-Prefixed (Latest)"
+          body: "Automated build of superpowers skills with sp- prefix for Agent Zero and Codex"
+          files: skills-sp-prefixed.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
